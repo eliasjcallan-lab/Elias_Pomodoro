@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Focus Pomodoro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --frame: #181718;
+      --bg: #0f172a;
+      --bg-soft: #111827;
+      --accent: #3b82f6;
+      --accent-soft: rgba(59, 130, 246, 0.15);
+      --text: #e5e7eb;
+      --text-soft: #9ca3af;
+      --danger: #f97373;
+      --success: #22c55e;
+      --radius-xl: 18px;
+      --radius-lg: 12px;
+      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      /* Fondo con el color 181718 como base del degradado */
+      background: radial-gradient(circle at top, #181718, #020617);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 480px;
+      background: linear-gradient(
+        145deg,
+        rgba(15, 23, 42, 0.98),
+        rgba(17, 24, 39, 0.99)
+      );
+      border-radius: 24px;
+      padding: 20px 20px 18px;
+      box-shadow: var(--shadow-soft);
+      /* Borde con el color solicitado */
+      border: 1px solid var(--frame);
+    }
+
+    .app-header {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .app-title {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .app-title span.logo-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(59, 130, 246, 0.9);
+    }
+
+    /* Ya no usamos subtítulo ni badge, pero dejo las clases por si luego quieres reutilizarlas
+    .app-subtitle {
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    .badge {
+      font-size: 10px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #111827;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      color: var(--text-soft);
+    }
+    */
+
+    /* Modo / Tabs */
+    .mode-switch {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: var(--radius-lg);
+      padding: 4px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      margin-bottom: 16px;
+    }
+
+    .mode-btn {
+      font-size: 11px;
+      border: none;
+      border-radius: 999px;
+      padding: 6px 4px;
+      background: transparent;
+      color: var(--text-soft);
+      cursor: pointer;
+      transition: all 0.18s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .mode-btn span.dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: transparent;
+    }
+
+    .mode-btn.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .mode-btn.active span.dot {
+      background: var(--accent);
+      box-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
+    }
+
+    /* Timer */
+    .timer-card {
+      background: radial-gradient(
+        circle at top,
+        rgba(37, 99, 235, 0.2),
+        rgba(15, 23, 42, 0.9)
+      );
+      border-radius: var(--radius-xl);
+      padding: 18px 16px 16px;
+      border: 1px solid rgba(37, 99, 235, 0.3);
+      margin-bottom: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .timer-card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: radial-gradient(
+        circle at 0% -10%,
+        rgba(59, 130, 246, 0.3),
+        transparent 60%
+      );
+      opacity: 0.55;
+      pointer-events: none;
+    }
+
+    .timer-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+      margin-bottom: 10px;
+    }
+
+    .timer-label {
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    .session-counter {
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    .timer-display {
+      font-size: 52px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-align: center;
+      margin: 4px 0 2px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .timer-status {
+      font-size: 11px;
+      text-align: center;
+      color: var(--text-soft);
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.8);
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+      margin-bottom: 4px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 100%;
+      transform-origin: left;
+      transform: scaleX(1);
+      background: linear-gradient(90deg, #22c55e, #3b82f6);
+      transition: transform 0.4s linear;
+    }
+
+    /* Controles */
+    .controls {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 6px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn {
+      flex: 1;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      padding: 8px 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.18s ease;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0b1220;
+      font-weight: 600;
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.6);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+      box-shadow: 0 16px 36px rgba(37, 99, 235, 0.75);
+    }
+
+    .btn-secondary {
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-soft);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    .btn-secondary:hover {
+      border-color: rgba(148, 163, 184, 0.8);
+      color: var(--text);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .pill {
+      font-size: 10px;
+      padding: 4px 6px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      color: var(--text-soft);
+      position: relative;
+      z-index: 1;
+      margin-bottom: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .pill input[type="checkbox"] {
+      accent-color: var(--accent);
+      width: 10px;
+      height: 10px;
+    }
+
+    /* Configuración simple */
+    .settings {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .settings-group {
+      background: var(--bg-soft);
+      border-radius: var(--radius-lg);
+      padding: 6px 8px 7px;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+    }
+
+    .settings-label {
+      font-size: 10px;
+      color: var(--text-soft);
+      margin-bottom: 2px;
+    }
+
+    .settings-input {
+      width: 100%;
+      border-radius: 999px;
+      border: none;
+      background: #020617;
+      padding: 4px 6px;
+      color: var(--text);
+      font-size: 12px;
+      text-align: center;
+      outline: none;
+    }
+
+    .settings-input:focus {
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+
+    /* Pie: mini resumen */
+    .footer {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      color: var(--text-soft);
+    }
+
+    .footer span.dot-separator::before {
+      content: "•";
+      margin: 0 6px;
+      opacity: 0.6;
+    }
+
+    @media (max-width: 420px) {
+      .app {
+        padding: 16px 14px 12px;
+      }
+      .timer-display {
+        font-size: 44px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div class="app-title">
+        <span class="logo-dot"></span>
+        <span>Focus Pomodoro</span>
+      </div>
+    </header>
+
+    <div class="mode-switch" id="mode-switch">
+      <button class="mode-btn active" data-mode="focus">
+        <span class="dot"></span>
+        Trabajo
+      </button>
+      <button class="mode-btn" data-mode="short">
+        <span class="dot"></span>
+        Pausa corta
+      </button>
+      <button class="mode-btn" data-mode="long">
+        <span class="dot"></span>
+        Pausa larga
+      </button>
+    </div>
+
+    <section class="timer-card">
+      <div class="timer-top">
+        <div class="timer-label" id="mode-label">Sesión de trabajo</div>
+        <div class="session-counter" id="session-counter">Pomodoros completados: 0</div>
+      </div>
+
+      <div class="timer-display" id="timer-display">25:00</div>
+      <div class="timer-status" id="timer-status">Listo para comenzar</div>
+
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+
+      <div class="controls">
+        <button class="btn btn-primary" id="btn-toggle">
+          ▶ Iniciar
+        </button>
+        <button class="btn btn-secondary" id="btn-reset">
+          ↺ Reiniciar
+        </button>
+      </div>
+
+      <label class="pill">
+        <input type="checkbox" id="auto-continue" checked />
+        Auto pasar a la siguiente fase
+      </label>
+
+      <div class="settings">
+        <div class="settings-group">
+          <div class="settings-label">Trabajo (min)</div>
+          <input class="settings-input" type="number" id="focus-min" min="1" value="25" />
+        </div>
+        <div class="settings-group">
+          <div class="settings-label">Pausa corta</div>
+          <input class="settings-input" type="number" id="short-min" min="1" value="5" />
+        </div>
+        <div class="settings-group">
+          <div class="settings-label">Pausa larga</div>
+          <input class="settings-input" type="number" id="long-min" min="1" value="15" />
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div>
+        <span>Tip: 4 pomodoros → pausa larga</span>
+      </div>
+      <div>
+        <span id="today-info"></span>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // --- Estado principal ---
+    const MODES = {
+      focus: { label: "Sesión de trabajo", colorClass: "focus" },
+      short: { label: "Pausa corta", colorClass: "short" },
+      long:  { label: "Pausa larga",  colorClass: "long" }
+    };
+
+    let currentMode = "focus";
+    let remainingSeconds = 25 * 60;
+    let totalSeconds = 25 * 60;
+    let timerId = null;
+    let isRunning = false;
+    let completedPomodoros = 0;
+    let focusStreak = 0;
+
+    // --- Elementos ---
+    const modeButtons   = document.querySelectorAll(".mode-btn");
+    const modeLabel     = document.getElementById("mode-label");
+    const sessionCounter= document.getElementById("session-counter");
+    const displayEl     = document.getElementById("timer-display");
+    const statusEl      = document.getElementById("timer-status");
+    const progressFill  = document.getElementById("progress-fill");
+    const btnToggle     = document.getElementById("btn-toggle");
+    const btnReset      = document.getElementById("btn-reset");
+    const autoContinue  = document.getElementById("auto-continue");
+    const focusInput    = document.getElementById("focus-min");
+    const shortInput    = document.getElementById("short-min");
+    const longInput     = document.getElementById("long-min");
+    const todayInfo     = document.getElementById("today-info");
+
+    // --- Funciones útiles ---
+    function formatTime(seconds) {
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+    }
+
+    function updateDisplay() {
+      displayEl.textContent = formatTime(remainingSeconds);
+      const progress = totalSeconds > 0 ? remainingSeconds / totalSeconds : 0;
+      progressFill.style.transform = "scaleX(" + progress + ")";
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      modeButtons.forEach(btn =>
+        btn.classList.toggle("active", btn.dataset.mode === mode)
+      );
+
+      let minutes;
+      if (mode === "focus") {
+        minutes = Math.max(1, Number(focusInput.value) || 25);
+      } else if (mode === "short") {
+        minutes = Math.max(1, Number(shortInput.value) || 5);
+      } else {
+        minutes = Math.max(1, Number(longInput.value) || 15);
+      }
+
+      totalSeconds = minutes * 60;
+      remainingSeconds = totalSeconds;
+      modeLabel.textContent = MODES[mode].label;
+      statusEl.textContent = isRunning ? "En curso..." : "Listo para comenzar";
+      updateDisplay();
+    }
+
+    function startTimer() {
+      if (isRunning) return;
+      isRunning = true;
+      btnToggle.textContent = "⏸ Pausar";
+      statusEl.textContent = "En curso...";
+      timerId = setInterval(() => {
+        remainingSeconds--;
+        if (remainingSeconds <= 0) {
+          clearInterval(timerId);
+          timerId = null;
+          isRunning = false;
+          remainingSeconds = 0;
+          updateDisplay();
+          handleFinish();
+        } else {
+          updateDisplay();
+        }
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      if (!isRunning) return;
+      clearInterval(timerId);
+      timerId = null;
+      isRunning = false;
+      btnToggle.textContent = "▶ Reanudar";
+      statusEl.textContent = "Pausado";
+    }
+
+    function resetTimer(keepMode = true) {
+      clearInterval(timerId);
+      timerId = null;
+      isRunning = false;
+      btnToggle.textContent = "▶ Iniciar";
+
+      if (keepMode) {
+        setMode(currentMode);
+      } else {
+        setMode("focus");
+      }
+      statusEl.textContent = "Listo para comenzar";
+    }
+
+    function handleFinish() {
+      statusEl.textContent = "¡Tiempo cumplido!";
+
+      if (currentMode === "focus") {
+        completedPomodoros++;
+        focusStreak++;
+        sessionCounter.textContent =
+          "Pomodoros completados: " + completedPomodoros;
+      } else {
+        focusStreak = 0;
+      }
+
+      if ("Notification" in window && Notification.permission === "granted") {
+        const msg =
+          currentMode === "focus"
+            ? "Fin de la sesión de trabajo. Toca una pausa."
+            : "Fin de la pausa. Vuelve al foco.";
+        new Notification("Pomodoro", { body: msg });
+      }
+
+      if (autoContinue.checked) {
+        if (currentMode === "focus") {
+          const nextMode = focusStreak >= 4 ? "long" : "short";
+          if (nextMode === "long") focusStreak = 0;
+          setMode(nextMode);
+        } else {
+          setMode("focus");
+        }
+        startTimer();
+      } else {
+        statusEl.textContent +=
+          " (Inicia la siguiente fase cuando quieras)";
+      }
+    }
+
+    // --- Eventos UI ---
+    modeButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const mode = btn.dataset.mode;
+        resetTimer(false);
+        setMode(mode);
+      });
+    });
+
+    btnToggle.addEventListener("click", () => {
+      if (isRunning) {
+        pauseTimer();
+      } else {
+        startTimer();
+      }
+    });
+
+    btnReset.addEventListener("click", () => {
+      resetTimer();
+    });
+
+    [focusInput, shortInput, longInput].forEach(input => {
+      input.addEventListener("change", () => {
+        setMode(currentMode);
+      });
+    });
+
+    (function setToday() {
+      const now = new Date();
+      const formatter = new Intl.DateTimeFormat("es-PE", {
+        weekday: "short",
+        day: "2-digit",
+        month: "short"
+      });
+      todayInfo.textContent = formatter.format(now);
+    })();
+
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission().catch(() => {});
+    }
+
+    setMode("focus");
+  </script>
+</body>
+</html>
