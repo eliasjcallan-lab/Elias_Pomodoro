@@ -96,29 +96,55 @@
       position: relative;
     }
 
-    /* Fila superior: modo, contador centrado, botones */
+    /* Nueva distribución superior */
     .timer-top {
       display: grid;
       grid-template-columns: auto 1fr auto;
       align-items: center;
-      margin-bottom: 10px;
-      column-gap: 16px;
+      margin-bottom: 12px;
+      column-gap: 12px;
     }
 
-    .timer-label {
-      font-size: 12px;
-      color: var(--text-soft);
+    /* Izquierda: botones */
+    .timer-left {
+      display: flex;
+      gap: 6px;
     }
 
+    .icon-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: #0f1e44;
+      border: 1px solid #1d4ed8;
+      color: #93c5fd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+      box-shadow: none !important;
+    }
+
+    .icon-btn:hover {
+      background: #1e3a8a;
+      color: #ffffff;
+    }
+
+    /* Centro: contador */
     .session-counter {
       font-size: 12px;
       color: var(--text-soft);
-      text-align: center; /* SIEMPRE centrado */
+      text-align: center;
+      width: 100%;
     }
 
-    .timer-actions {
-      display: flex;
-      gap: 6px;
+    /* Derecha: nombre del modo */
+    .timer-label {
+      font-size: 12px;
+      color: var(--text-soft);
+      text-align: right;
     }
 
     .timer-display {
@@ -178,28 +204,6 @@
       border: 1px solid #1f2937;
     }
 
-    /* Botones superiores */
-    .icon-btn {
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
-      background: #0f1e44;
-      border: 1px solid #1d4ed8;
-      color: #93c5fd;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 15px;
-      cursor: pointer;
-      transition: background 0.15s ease, color 0.15s ease;
-      box-shadow: none !important;
-    }
-
-    .icon-btn:hover {
-      background: #1e3a8a;
-      color: #ffffff;
-    }
-
     .pill {
       font-size: 10px;
       padding: 4px 6px;
@@ -220,6 +224,7 @@
       justify-content: space-between;
     }
 
+    /* Popup ajustes */
     .settings-modal {
       position: absolute;
       inset: 0;
@@ -280,17 +285,23 @@
 
     <section class="timer-card">
 
+      <!-- NUEVA FILA SUPERIOR -->
       <div class="timer-top">
-        <div class="timer-label" id="mode-label">Sesión de trabajo</div>
 
+        <!-- Botones izquierda -->
+        <div class="timer-left">
+          <button class="icon-btn" id="btn-next">▶▶</button>
+          <button class="icon-btn" id="btn-config">⚙</button>
+        </div>
+
+        <!-- Contador centrado -->
         <div class="session-counter" id="session-counter">
           Pomodoros completados: 0
         </div>
 
-        <div class="timer-actions">
-          <button class="icon-btn" id="btn-next">▶▶</button>
-          <button class="icon-btn" id="btn-config">⚙</button>
-        </div>
+        <!-- Modo a la derecha -->
+        <div class="timer-label" id="mode-label">Sesión de trabajo</div>
+
       </div>
 
       <div class="timer-display" id="timer-display">25:00</div>
@@ -315,21 +326,23 @@
         <span id="today-info"></span>
       </footer>
 
+      <!-- POPUP -->
       <div class="settings-modal" id="settings-modal">
         <div class="settings-modal-content">
           <h4>Ajustes</h4>
 
           <label>Trabajo (min)
-            <input class="settings-input" type="number" id="focus-min" value="25" min="1">
+            <input class="settings-input" type="number" id="focus-min" value="25">
           </label>
 
           <label>Pausa corta (min)
-            <input class="settings-input" type="number" id="short-min" value="5" min="1">
+            <input class="settings-input" type="number" id="short-min" value="5">
           </label>
 
           <label>Pausa larga (min)
-            <input class="settings-input" type="number" id="long-min" value="15" min="1">
+            <input class="settings-input" type="number" id="long-min" value="15">
           </label>
+
         </div>
       </div>
 
@@ -343,7 +356,6 @@
     short: { label:"Pausa corta" },
     long:  { label:"Pausa larga" }
   };
-
   const modesOrder = ["focus","short","long"];
 
   const modeButtons = document.querySelectorAll(".mode-btn");
@@ -364,14 +376,15 @@
   const todayInfo   = document.getElementById("today-info");
 
   let currentMode = "focus";
-  let totalSeconds = 25*60;
+  let totalSeconds = 25 * 60;
   let remainingSeconds = totalSeconds;
   let timerId = null;
   let isRunning = false;
   let completedPomodoros = 0;
 
-  // --- SONIDO PERSONALIZADO ---
-  // Asegúrate de subir el archivo a GitHub como "pomodoro-beep.mp3"
+  /* ============================
+      SONIDO PERSONALIZADO
+  ============================= */
   const beepAudio = new Audio("pomodoro-beep.mp3");
   beepAudio.volume = 1.0;
 
@@ -379,8 +392,8 @@
     try {
       beepAudio.currentTime = 0;
       beepAudio.play().catch(()=>{});
-    } catch (e) {
-      console.error("Error reproduciendo el sonido:", e);
+    } catch(e) {
+      console.error(e);
     }
   }
 
@@ -396,11 +409,15 @@
 
   function setMode(mode){
     currentMode = mode;
-    modeButtons.forEach(b => b.classList.toggle("active", b.dataset.mode===mode));
 
-    let m = (mode==="focus") ? Number(focusInput.value || 25) :
-            (mode==="short") ? Number(shortInput.value || 5) :
-            Number(longInput.value || 15);
+    modeButtons.forEach(b =>
+      b.classList.toggle("active", b.dataset.mode === mode)
+    );
+
+    let m =
+      mode === "focus" ? Number(focusInput.value || 25) :
+      mode === "short" ? Number(shortInput.value || 5) :
+                         Number(longInput.value || 15);
 
     if (m < 1) m = 1;
 
@@ -413,31 +430,38 @@
   }
 
   function updateDisplay(){
-    const m = Math.floor(remainingSeconds/60);
-    const s = remainingSeconds%60;
+    const m = Math.floor(remainingSeconds / 60);
+    const s = remainingSeconds % 60;
+
     displayEl.textContent =
       (m<10?"0":"")+m+":"+(s<10?"0":"")+s;
 
-    const ratio = totalSeconds > 0 ? remainingSeconds/totalSeconds : 0;
-    progressFill.style.transform = "scaleX("+ratio+")";
+    const ratio = totalSeconds > 0
+      ? remainingSeconds / totalSeconds
+      : 0;
+
+    progressFill.style.transform =
+      "scaleX(" + ratio + ")";
   }
 
   function startTimer(){
     if(isRunning) return;
+
     isRunning = true;
     btnToggle.textContent = "⏸ Pausar";
     statusEl.textContent = "En curso...";
 
     timerId = setInterval(()=>{
       remainingSeconds--;
+
       if(remainingSeconds <= 0){
         clearInterval(timerId);
         isRunning = false;
         remainingSeconds = 0;
+
         updateDisplay();
         statusEl.textContent = "¡Tiempo cumplido!";
-        
-        playBeep();  // SUENA TU ARCHIVO PERSONALIZADO
+        playBeep();
 
         if(currentMode === "focus"){
           completedPomodoros++;
@@ -446,14 +470,15 @@
         }
 
         if(autoContinue.checked){
-          if(currentMode==="focus") setMode("short");
+          if(currentMode === "focus") setMode("short");
           else setMode("focus");
           startTimer();
         }
         return;
       }
+
       updateDisplay();
-    },1000);
+    }, 1000);
   }
 
   function pauseTimer(){
@@ -470,39 +495,39 @@
     setMode(currentMode);
   }
 
-  btnToggle.onclick = ()=>{
+  btnToggle.onclick = () => {
     if(isRunning) pauseTimer();
     else startTimer();
   };
 
-  btnReset.onclick = ()=>resetTimer();
+  btnReset.onclick = () => resetTimer();
 
-  modeButtons.forEach(btn=>{
-    btn.onclick = ()=>{
+  modeButtons.forEach(btn => {
+    btn.onclick = () => {
       resetTimer();
       setMode(btn.dataset.mode);
     };
   });
 
-  nextBtn.onclick = ()=>{
-    const idx = modesOrder.indexOf(currentMode);
-    const next = modesOrder[(idx+1) % modesOrder.length];
+  nextBtn.onclick = () => {
+    const index = modesOrder.indexOf(currentMode);
+    const nextMode = modesOrder[(index + 1) % modesOrder.length];
     resetTimer();
-    setMode(next);
+    setMode(nextMode);
   };
 
-  configBtn.onclick = ()=>{
+  configBtn.onclick = () => {
     settingsModal.classList.toggle("open");
   };
 
-  settingsModal.onclick = e=>{
+  settingsModal.onclick = (e) => {
     if(e.target === settingsModal){
       settingsModal.classList.remove("open");
     }
   };
 
-  [focusInput, shortInput, longInput].forEach(inp=>{
-    inp.addEventListener("change", ()=>{
+  [focusInput, shortInput, longInput].forEach(inp => {
+    inp.addEventListener("change", () => {
       if(inp.value < 1) inp.value = 1;
       setMode(currentMode);
     });
