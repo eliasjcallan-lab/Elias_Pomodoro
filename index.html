@@ -7,17 +7,13 @@
   <style>
     :root {
       --frame: #181718;
-      --bg: #0f172a;
       --bg-soft: #111827;
       --accent: #3b82f6;
       --accent-soft: rgba(59, 130, 246, 0.15);
       --text: #e5e7eb;
       --text-soft: #9ca3af;
-      --danger: #f97373;
-      --success: #22c55e;
       --radius-xl: 18px;
       --radius-lg: 12px;
-      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.45);
     }
 
     * {
@@ -43,21 +39,16 @@
       background: #181718;
       border-radius: 24px;
       padding: 8px;
-      box-shadow: var(--shadow-soft);
       border: 1px solid var(--frame);
     }
 
     .app-header {
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
       margin-bottom: 8px;
     }
 
     .app-title {
       font-size: 16px;
       font-weight: 600;
-      letter-spacing: 0.03em;
       display: flex;
       gap: 8px;
       align-items: center;
@@ -68,7 +59,6 @@
       height: 10px;
       border-radius: 999px;
       background: var(--accent);
-      box-shadow: 0 0 12px rgba(59, 130, 246, 0.9);
     }
 
     .mode-switch {
@@ -90,18 +80,6 @@
       background: transparent;
       color: var(--text-soft);
       cursor: pointer;
-      transition: all 0.18s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-    }
-
-    .mode-btn span.dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: transparent;
     }
 
     .mode-btn.active {
@@ -110,45 +88,21 @@
       font-weight: 500;
     }
 
-    .mode-btn.active span.dot {
-      background: var(--accent);
-      box-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
-    }
-
     .timer-card {
-      background: radial-gradient(
-        circle at top,
-        rgba(37, 99, 235, 0.35),
-        rgba(3, 7, 18, 0.98)
-      );
+      background: radial-gradient(circle at top, rgba(37, 99, 235, 0.3), rgba(3, 7, 18, 1));
       border-radius: 22px;
-      padding: 16px 16px 12px;
+      padding: 16px;
       border: 1px solid rgba(37, 99, 235, 0.3);
       position: relative;
-      overflow: hidden;
     }
 
-    .timer-card::before {
-      content: "";
-      position: absolute;
-      inset: -40%;
-      background: radial-gradient(
-        circle at 0% -10%,
-        rgba(59, 130, 246, 0.35),
-        transparent 60%
-      );
-      opacity: 0.55;
-      pointer-events: none;
-    }
-
+    /* Fila superior: modo, contador centrado, botones */
     .timer-top {
-      display: flex;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
       align-items: center;
-      position: relative;
-      z-index: 1;
-      margin-bottom: 8px;
-      gap: 8px;
+      margin-bottom: 10px;
+      column-gap: 16px;
     }
 
     .timer-label {
@@ -159,18 +113,19 @@
     .session-counter {
       font-size: 12px;
       color: var(--text-soft);
-      text-align: right;
-      white-space: nowrap;
+      text-align: center; /* SIEMPRE centrado */
+    }
+
+    .timer-actions {
+      display: flex;
+      gap: 6px;
     }
 
     .timer-display {
       font-size: 52px;
       font-weight: 600;
-      letter-spacing: 0.08em;
       text-align: center;
-      margin: 4px 0 2px;
-      position: relative;
-      z-index: 1;
+      margin: 6px 0;
     }
 
     .timer-status {
@@ -178,8 +133,6 @@
       text-align: center;
       color: var(--text-soft);
       margin-bottom: 10px;
-      position: relative;
-      z-index: 1;
     }
 
     .progress-bar {
@@ -187,10 +140,8 @@
       height: 5px;
       border-radius: 999px;
       background: rgba(15, 23, 42, 0.8);
-      overflow: hidden;
-      position: relative;
-      z-index: 1;
       margin-bottom: 6px;
+      overflow: hidden;
     }
 
     .progress-fill {
@@ -199,131 +150,83 @@
       transform-origin: left;
       transform: scaleX(1);
       background: linear-gradient(90deg, #22c55e, #3b82f6);
-      transition: transform 0.4s linear;
     }
 
     .controls {
       display: flex;
       gap: 8px;
-      margin-bottom: 4px;
-      position: relative;
-      z-index: 1;
+      margin-bottom: 6px;
     }
 
     .btn {
       flex: 1;
+      height: 38px;
       border-radius: 999px;
+      font-size: 14px;
       border: none;
       cursor: pointer;
-      font-size: 13px;
-      padding: 8px 0;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: all 0.18s ease;
     }
 
     .btn-primary {
       background: var(--accent);
-      color: #0b1220;
-      font-weight: 600;
-      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.6);
-    }
-
-    .btn-primary:hover {
-      filter: brightness(1.05);
-      transform: translateY(-1px);
-      box-shadow: 0 16px 36px rgba(37, 99, 235, 0.75);
+      color: #0d1117;
     }
 
     .btn-secondary {
-      background: rgba(15, 23, 42, 0.9);
+      background: #0f172a;
       color: var(--text-soft);
-      border: 1px solid rgba(148, 163, 184, 0.4);
+      border: 1px solid #1f2937;
     }
 
-    .btn-secondary:hover {
-      border-color: rgba(148, 163, 184, 0.8);
-      color: var(--text);
+    /* Botones superiores */
+    .icon-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: #0f1e44;
+      border: 1px solid #1d4ed8;
+      color: #93c5fd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+      box-shadow: none !important;
     }
 
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: default;
-      box-shadow: none;
-      transform: none;
+    .icon-btn:hover {
+      background: #1e3a8a;
+      color: #ffffff;
     }
 
     .pill {
       font-size: 10px;
       padding: 4px 6px;
       border-radius: 999px;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: #0f172a;
+      border: 1px solid #1f2937;
       color: var(--text-soft);
-      position: relative;
-      z-index: 1;
-      margin-bottom: 4px;
       display: inline-flex;
       align-items: center;
       gap: 4px;
     }
 
-    .pill input[type="checkbox"] {
-      accent-color: var(--accent);
-      width: 10px;
-      height: 10px;
-    }
-
     .footer {
       margin-top: 4px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       font-size: 10px;
       color: var(--text-soft);
-      position: relative;
-      z-index: 1;
-    }
-
-    /* Botón configuración */
-    .config-btn {
-      position: absolute;
-      top: 8px;
-      right: 10px;
-      width: 24px;
-      height: 24px;
-      border-radius: 999px;
-      border: 1px solid rgba(0, 0, 0, 0.7);
-      background: #181718;
-      color: #e5e7eb;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      cursor: pointer;
-      z-index: 3;
-      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5);
-      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+      justify-content: space-between;
     }
 
-    .config-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.7);
-      background: #020617;
-    }
-
-    /* Popup de ajustes */
     .settings-modal {
       position: absolute;
       inset: 0;
-      background: rgba(3, 7, 18, 0.75);
+      background: rgba(0,0,0,0.5);
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 2;
-      padding: 16px;
     }
 
     .settings-modal.open {
@@ -332,104 +235,36 @@
 
     .settings-modal-content {
       background: #020617;
-      border-radius: 18px;
-      padding: 14px 16px 12px;
-      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 16px;
+      border-radius: 14px;
       width: 100%;
-      max-width: 320px;
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
+      max-width: 300px;
+      border: 1px solid rgba(148,163,184,0.4);
     }
 
-    .settings-modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .settings-modal-content h4 {
       margin-bottom: 8px;
-    }
-
-    .settings-modal-title {
-      font-size: 13px;
-      font-weight: 600;
-    }
-
-    .settings-modal-close {
-      background: transparent;
-      border: none;
-      color: var(--text-soft);
-      cursor: pointer;
-      font-size: 16px;
-      line-height: 1;
-    }
-
-    .settings {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 6px;
-      margin-top: 4px;
-    }
-
-    .settings-group {
-      background: var(--bg-soft);
-      border-radius: var(--radius-lg);
-      padding: 6px 8px 7px;
-      border: 1px solid rgba(31, 41, 55, 0.9);
-    }
-
-    .settings-label {
-      font-size: 10px;
-      color: var(--text-soft);
-      margin-bottom: 2px;
+      color: #e5e7eb;
+      font-size: 14px;
     }
 
     .settings-input {
       width: 100%;
-      border-radius: 999px;
-      border: none;
-      background: #020617;
-      padding: 4px 6px;
-      color: var(--text);
-      font-size: 12px;
+      margin-top: 4px;
+      margin-bottom: 8px;
+      padding: 6px;
+      border-radius: 8px;
+      background: #0f172a;
+      border: 1px solid #1f2937;
+      color: white;
       text-align: center;
-      outline: none;
-    }
-
-    .settings-input:focus {
-      box-shadow: 0 0 0 1px var(--accent);
-    }
-
-    .settings-hint {
-      margin-top: 6px;
-      font-size: 10px;
-      color: var(--text-soft);
-      opacity: 0.9;
-    }
-
-    @media (max-height: 420px) {
-      body:not(.config-open) .mode-switch,
-      body:not(.config-open) .pill,
-      body:not(.config-open) .footer,
-      body:not(.config-open) .session-counter {
-        display: none;
-      }
-
-      body:not(.config-open) .app-header {
-        display: none;
-      }
-
-      body:not(.config-open) .timer-card {
-        margin: 0;
-      }
-    }
-
-    @media (max-width: 420px) {
-      .timer-display {
-        font-size: 44px;
-      }
     }
   </style>
 </head>
 <body>
+
   <div class="app">
+
     <header class="app-header">
       <div class="app-title">
         <span class="logo-dot"></span>
@@ -438,30 +273,23 @@
     </header>
 
     <div class="mode-switch" id="mode-switch">
-      <button class="mode-btn active" data-mode="focus">
-        <span class="dot"></span>
-        Trabajo
-      </button>
-      <button class="mode-btn" data-mode="short">
-        <span class="dot"></span>
-        Pausa corta
-      </button>
-      <button class="mode-btn" data-mode="long">
-        <span class="dot"></span>
-        Pausa larga
-      </button>
+      <button class="mode-btn active" data-mode="focus">Trabajo</button>
+      <button class="mode-btn" data-mode="short">Pausa corta</button>
+      <button class="mode-btn" data-mode="long">Pausa larga</button>
     </div>
 
     <section class="timer-card">
-      <!-- Botón configuración -->
-      <button class="config-btn" id="btn-config" title="Configuración">
-        ⚙
-      </button>
 
       <div class="timer-top">
         <div class="timer-label" id="mode-label">Sesión de trabajo</div>
+
         <div class="session-counter" id="session-counter">
           Pomodoros completados: 0
+        </div>
+
+        <div class="timer-actions">
+          <button class="icon-btn" id="btn-next">▶▶</button>
+          <button class="icon-btn" id="btn-config">⚙</button>
         </div>
       </div>
 
@@ -473,281 +301,216 @@
       </div>
 
       <div class="controls">
-        <button class="btn btn-primary" id="btn-toggle">
-          ▶ Iniciar
-        </button>
-        <button class="btn btn-secondary" id="btn-reset">
-          ↺ Reiniciar
-        </button>
+        <button class="btn btn-primary" id="btn-toggle">▶ Iniciar</button>
+        <button class="btn btn-secondary" id="btn-reset">↺ Reiniciar</button>
       </div>
 
       <label class="pill">
         <input type="checkbox" id="auto-continue" checked />
-        Auto pasar a la siguiente fase
+        Auto continuar
       </label>
 
       <footer class="footer">
-        <div>
-          <span>Tip: 4 pomodoros → pausa larga</span>
-        </div>
-        <div>
-          <span id="today-info"></span>
-        </div>
+        <span>Tip: 4 pomodoros → pausa larga</span>
+        <span id="today-info"></span>
       </footer>
 
-      <!-- POPUP DE AJUSTES -->
       <div class="settings-modal" id="settings-modal">
         <div class="settings-modal-content">
-          <div class="settings-modal-header">
-            <div class="settings-modal-title">Ajustes de duración</div>
-            <button class="settings-modal-close" id="settings-close" title="Cerrar">
-              ✕
-            </button>
-          </div>
+          <h4>Ajustes</h4>
 
-          <div class="settings">
-            <div class="settings-group">
-              <div class="settings-label">Trabajo (min)</div>
-              <input class="settings-input" type="number" id="focus-min" min="1" value="25" />
-            </div>
-            <div class="settings-group">
-              <div class="settings-label">Pausa corta (min)</div>
-              <input class="settings-input" type="number" id="short-min" min="1" value="5" />
-            </div>
-            <div class="settings-group">
-              <div class="settings-label">Pausa larga (min)</div>
-              <input class="settings-input" type="number" id="long-min" min="1" value="15" />
-            </div>
-          </div>
+          <label>Trabajo (min)
+            <input class="settings-input" type="number" id="focus-min" value="25" min="1">
+          </label>
 
-          <div class="settings-hint">
-            Los cambios aplican al siguiente inicio de cada modo.
-          </div>
+          <label>Pausa corta (min)
+            <input class="settings-input" type="number" id="short-min" value="5" min="1">
+          </label>
+
+          <label>Pausa larga (min)
+            <input class="settings-input" type="number" id="long-min" value="15" min="1">
+          </label>
         </div>
       </div>
+
     </section>
   </div>
 
-  <script>
-    const MODES = {
-      focus: { label: "Sesión de trabajo" },
-      short: { label: "Pausa corta" },
-      long:  { label: "Pausa larga" }
-    };
+<script>
 
-    let currentMode = "focus";
-    let remainingSeconds = 25 * 60;
-    let totalSeconds = 25 * 60;
-    let timerId = null;
-    let isRunning = false;
-    let completedPomodoros = 0;
-    let focusStreak = 0;
+  const MODES = {
+    focus: { label:"Sesión de trabajo" },
+    short: { label:"Pausa corta" },
+    long:  { label:"Pausa larga" }
+  };
 
-    const modeButtons    = document.querySelectorAll(".mode-btn");
-    const modeLabel      = document.getElementById("mode-label");
-    const sessionCounter = document.getElementById("session-counter");
-    const displayEl      = document.getElementById("timer-display");
-    const statusEl       = document.getElementById("timer-status");
-    const progressFill   = document.getElementById("progress-fill");
-    const btnToggle      = document.getElementById("btn-toggle");
-    const btnReset       = document.getElementById("btn-reset");
-    const autoContinue   = document.getElementById("auto-continue");
-    const focusInput     = document.getElementById("focus-min");
-    const shortInput     = document.getElementById("short-min");
-    const longInput      = document.getElementById("long-min");
-    const todayInfo      = document.getElementById("today-info");
-    const configBtn      = document.getElementById("btn-config");
-    const settingsModal  = document.getElementById("settings-modal");
-    const settingsClose  = document.getElementById("settings-close");
+  const modesOrder = ["focus","short","long"];
 
-    let configOpen = false;
+  const modeButtons = document.querySelectorAll(".mode-btn");
+  const modeLabel   = document.getElementById("mode-label");
+  const sessionCounter = document.getElementById("session-counter");
+  const displayEl   = document.getElementById("timer-display");
+  const statusEl    = document.getElementById("timer-status");
+  const progressFill= document.getElementById("progress-fill");
+  const btnToggle   = document.getElementById("btn-toggle");
+  const btnReset    = document.getElementById("btn-reset");
+  const autoContinue= document.getElementById("auto-continue");
+  const nextBtn     = document.getElementById("btn-next");
+  const configBtn   = document.getElementById("btn-config");
+  const settingsModal = document.getElementById("settings-modal");
+  const focusInput  = document.getElementById("focus-min");
+  const shortInput  = document.getElementById("short-min");
+  const longInput   = document.getElementById("long-min");
+  const todayInfo   = document.getElementById("today-info");
 
-    function formatTime(seconds) {
-      const m = Math.floor(seconds / 60);
-      const s = seconds % 60;
-      return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+  let currentMode = "focus";
+  let totalSeconds = 25*60;
+  let remainingSeconds = totalSeconds;
+  let timerId = null;
+  let isRunning = false;
+  let completedPomodoros = 0;
+
+  // --- SONIDO PERSONALIZADO ---
+  // Asegúrate de subir el archivo a GitHub como "pomodoro-beep.mp3"
+  const beepAudio = new Audio("pomodoro-beep.mp3");
+  beepAudio.volume = 1.0;
+
+  function playBeep() {
+    try {
+      beepAudio.currentTime = 0;
+      beepAudio.play().catch(()=>{});
+    } catch (e) {
+      console.error("Error reproduciendo el sonido:", e);
     }
+  }
 
-    function updateDisplay() {
-      displayEl.textContent = formatTime(remainingSeconds);
-      const progress = totalSeconds > 0 ? remainingSeconds / totalSeconds : 0;
-      progressFill.style.transform = "scaleX(" + progress + ")";
-    }
+  function setToday() {
+    const now = new Date();
+    const fmt = new Intl.DateTimeFormat("es-PE", {
+      weekday: "short",
+      day: "2-digit",
+      month: "short"
+    });
+    todayInfo.textContent = fmt.format(now);
+  }
 
-    function setMode(mode) {
-      currentMode = mode;
-      modeButtons.forEach(btn =>
-        btn.classList.toggle("active", btn.dataset.mode === mode)
-      );
+  function setMode(mode){
+    currentMode = mode;
+    modeButtons.forEach(b => b.classList.toggle("active", b.dataset.mode===mode));
 
-      let minutes;
-      if (mode === "focus") {
-        minutes = Math.max(1, Number(focusInput.value) || 25);
-      } else if (mode === "short") {
-        minutes = Math.max(1, Number(shortInput.value) || 5);
-      } else {
-        minutes = Math.max(1, Number(longInput.value) || 15);
+    let m = (mode==="focus") ? Number(focusInput.value || 25) :
+            (mode==="short") ? Number(shortInput.value || 5) :
+            Number(longInput.value || 15);
+
+    if (m < 1) m = 1;
+
+    totalSeconds = m * 60;
+    remainingSeconds = totalSeconds;
+
+    modeLabel.textContent = MODES[mode].label;
+    statusEl.textContent = "Listo para comenzar";
+    updateDisplay();
+  }
+
+  function updateDisplay(){
+    const m = Math.floor(remainingSeconds/60);
+    const s = remainingSeconds%60;
+    displayEl.textContent =
+      (m<10?"0":"")+m+":"+(s<10?"0":"")+s;
+
+    const ratio = totalSeconds > 0 ? remainingSeconds/totalSeconds : 0;
+    progressFill.style.transform = "scaleX("+ratio+")";
+  }
+
+  function startTimer(){
+    if(isRunning) return;
+    isRunning = true;
+    btnToggle.textContent = "⏸ Pausar";
+    statusEl.textContent = "En curso...";
+
+    timerId = setInterval(()=>{
+      remainingSeconds--;
+      if(remainingSeconds <= 0){
+        clearInterval(timerId);
+        isRunning = false;
+        remainingSeconds = 0;
+        updateDisplay();
+        statusEl.textContent = "¡Tiempo cumplido!";
+        
+        playBeep();  // SUENA TU ARCHIVO PERSONALIZADO
+
+        if(currentMode === "focus"){
+          completedPomodoros++;
+          sessionCounter.textContent =
+            "Pomodoros completados: " + completedPomodoros;
+        }
+
+        if(autoContinue.checked){
+          if(currentMode==="focus") setMode("short");
+          else setMode("focus");
+          startTimer();
+        }
+        return;
       }
-
-      totalSeconds = minutes * 60;
-      remainingSeconds = totalSeconds;
-      modeLabel.textContent = MODES[mode].label;
-      statusEl.textContent = isRunning ? "En curso..." : "Listo para comenzar";
       updateDisplay();
-    }
+    },1000);
+  }
 
-    function startTimer() {
-      if (isRunning) return;
-      isRunning = true;
-      btnToggle.textContent = "⏸ Pausar";
-      statusEl.textContent = "En curso...";
-      timerId = setInterval(() => {
-        remainingSeconds--;
-        if (remainingSeconds <= 0) {
-          clearInterval(timerId);
-          timerId = null;
-          isRunning = false;
-          remainingSeconds = 0;
-          updateDisplay();
-          handleFinish();
-        } else {
-          updateDisplay();
-        }
-      }, 1000);
-    }
+  function pauseTimer(){
+    clearInterval(timerId);
+    isRunning = false;
+    btnToggle.textContent = "▶ Reanudar";
+    statusEl.textContent = "Pausado";
+  }
 
-    function pauseTimer() {
-      if (!isRunning) return;
-      clearInterval(timerId);
-      timerId = null;
-      isRunning = false;
-      btnToggle.textContent = "▶ Reanudar";
-      statusEl.textContent = "Pausado";
-    }
+  function resetTimer(){
+    clearInterval(timerId);
+    isRunning = false;
+    btnToggle.textContent = "▶ Iniciar";
+    setMode(currentMode);
+  }
 
-    function resetTimer(keepMode = true) {
-      clearInterval(timerId);
-      timerId = null;
-      isRunning = false;
-      btnToggle.textContent = "▶ Iniciar";
+  btnToggle.onclick = ()=>{
+    if(isRunning) pauseTimer();
+    else startTimer();
+  };
 
-      if (keepMode) {
-        setMode(currentMode);
-      } else {
-        setMode("focus");
-      }
-      statusEl.textContent = "Listo para comenzar";
-    }
+  btnReset.onclick = ()=>resetTimer();
 
-    function handleFinish() {
-      statusEl.textContent = "¡Tiempo cumplido!";
-
-      if (currentMode === "focus") {
-        completedPomodoros++;
-        focusStreak++;
-        sessionCounter.textContent =
-          "Pomodoros completados: " + completedPomodoros;
-      } else {
-        focusStreak = 0;
-      }
-
-      if ("Notification" in window && Notification.permission === "granted") {
-        const msg =
-          currentMode === "focus"
-            ? "Fin de la sesión de trabajo. Toca una pausa."
-            : "Fin de la pausa. Vuelve al foco.";
-        new Notification("Pomodoro", { body: msg });
-      }
-
-      if (autoContinue.checked) {
-        if (currentMode === "focus") {
-          const nextMode = focusStreak >= 4 ? "long" : "short";
-          if (nextMode === "long") focusStreak = 0;
-          setMode(nextMode);
-        } else {
-          setMode("focus");
-        }
-        startTimer();
-      } else {
-        statusEl.textContent +=
-          " (Inicia la siguiente fase cuando quieras)";
-      }
-    }
-
-    modeButtons.forEach(btn => {
-      btn.addEventListener("click", () => {
-        const mode = btn.dataset.mode;
-        resetTimer(false);
-        setMode(mode);
-      });
-    });
-
-    btnToggle.addEventListener("click", () => {
-      if (isRunning) {
-        pauseTimer();
-      } else {
-        startTimer();
-      }
-    });
-
-    btnReset.addEventListener("click", () => {
+  modeButtons.forEach(btn=>{
+    btn.onclick = ()=>{
       resetTimer();
-    });
+      setMode(btn.dataset.mode);
+    };
+  });
 
-    [focusInput, shortInput, longInput].forEach(input => {
-      input.addEventListener("change", () => {
-        setMode(currentMode);
-      });
-    });
+  nextBtn.onclick = ()=>{
+    const idx = modesOrder.indexOf(currentMode);
+    const next = modesOrder[(idx+1) % modesOrder.length];
+    resetTimer();
+    setMode(next);
+  };
 
-    // Abrir / cerrar popup de ajustes
-    function openConfig() {
-      configOpen = true;
-      document.body.classList.add("config-open");
-      settingsModal.classList.add("open");
-      configBtn.textContent = "✕";
-    }
+  configBtn.onclick = ()=>{
+    settingsModal.classList.toggle("open");
+  };
 
-    function closeConfig() {
-      configOpen = false;
-      document.body.classList.remove("config-open");
+  settingsModal.onclick = e=>{
+    if(e.target === settingsModal){
       settingsModal.classList.remove("open");
-      configBtn.textContent = "⚙";
     }
+  };
 
-    configBtn.addEventListener("click", () => {
-      if (configOpen) {
-        closeConfig();
-      } else {
-        openConfig();
-      }
+  [focusInput, shortInput, longInput].forEach(inp=>{
+    inp.addEventListener("change", ()=>{
+      if(inp.value < 1) inp.value = 1;
+      setMode(currentMode);
     });
+  });
 
-    settingsClose.addEventListener("click", () => {
-      closeConfig();
-    });
+  setToday();
+  setMode("focus");
+</script>
 
-    settingsModal.addEventListener("click", (e) => {
-      if (e.target === settingsModal) {
-        closeConfig();
-      }
-    });
-
-    (function setToday() {
-      const now = new Date();
-      const formatter = new Intl.DateTimeFormat("es-PE", {
-        weekday: "short",
-        day: "2-digit",
-        month: "short"
-      });
-      todayInfo.textContent = formatter.format(now);
-    })();
-
-    if ("Notification" in window && Notification.permission === "default") {
-      Notification.requestPermission().catch(() => {});
-    }
-
-    setMode("focus");
-  </script>
 </body>
 </html>
