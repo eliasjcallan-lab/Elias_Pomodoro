@@ -35,7 +35,7 @@
     .app {
       width: 100%;
       max-width: 420px;
-      background: transparent; /* sin borde exterior */
+      background: transparent;
       border-radius: 20px;
       padding: 0;
       border: none;
@@ -52,7 +52,7 @@
       );
       border-radius: 18px;
       padding: 10px 14px 10px;
-      border: none !important; /* quitar borde azul definitivamente */
+      border: none !important;
     }
 
     /* Fila superior */
@@ -207,6 +207,19 @@
       text-align: center;
       font-size: 12px;
     }
+
+    .settings-toggle {
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--text-soft);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .settings-toggle input {
+      accent-color: var(--accent);
+    }
   </style>
 </head>
 
@@ -257,6 +270,13 @@
           <label>Pausa larga (min)
             <input class="settings-input" type="number" id="long-min" value="15">
           </label>
+
+          <div class="settings-toggle">
+            <label>
+              <input type="checkbox" id="auto-continue" checked />
+              Auto pasar a la siguiente fase
+            </label>
+          </div>
         </div>
       </div>
 
@@ -264,7 +284,6 @@
   </div>
 
 <script>
-
   const MODES = {
     focus: { label:"Sesión de trabajo" },
     short: { label:"Pausa corta" },
@@ -273,19 +292,20 @@
 
   const modesOrder = ["focus","short","long"];
 
-  const modeLabel   = document.getElementById("mode-label");
+  const modeLabel      = document.getElementById("mode-label");
   const sessionCounter = document.getElementById("session-counter");
-  const displayEl   = document.getElementById("timer-display");
-  const statusEl    = document.getElementById("timer-status");
-  const progressFill= document.getElementById("progress-fill");
-  const btnToggle   = document.getElementById("btn-toggle");
-  const btnReset    = document.getElementById("btn-reset");
-  const nextBtn     = document.getElementById("btn-next");
-  const configBtn   = document.getElementById("btn-config");
-  const settingsModal = document.getElementById("settings-modal");
-  const focusInput  = document.getElementById("focus-min");
-  const shortInput  = document.getElementById("short-min");
-  const longInput   = document.getElementById("long-min");
+  const displayEl      = document.getElementById("timer-display");
+  const statusEl       = document.getElementById("timer-status");
+  const progressFill   = document.getElementById("progress-fill");
+  const btnToggle      = document.getElementById("btn-toggle");
+  const btnReset       = document.getElementById("btn-reset");
+  const nextBtn        = document.getElementById("btn-next");
+  const configBtn      = document.getElementById("btn-config");
+  const settingsModal  = document.getElementById("settings-modal");
+  const focusInput     = document.getElementById("focus-min");
+  const shortInput     = document.getElementById("short-min");
+  const longInput      = document.getElementById("long-min");
+  const autoContinueCb = document.getElementById("auto-continue");
 
   let currentMode = "focus";
   let totalSeconds = 25 * 60;
@@ -293,7 +313,7 @@
   let timerId = null;
   let isRunning = false;
   let completedPomodoros = 0;
-  const autoContinueEnabled = true;
+  let autoContinueEnabled = true;  // ahora configurable
 
   /* SONIDO PERSONALIZADO */
   const beepAudio = new Audio("pomodoro-beep.mp3");
@@ -307,7 +327,6 @@
   }
 
   function setMode(mode){
-
     currentMode = mode;
 
     let m =
@@ -421,6 +440,13 @@
     });
   });
 
+  // Toggle para auto continuar
+  autoContinueCb.addEventListener("change", () => {
+    autoContinueEnabled = autoContinueCb.checked;
+  });
+
+  // Estado inicial
+  autoContinueEnabled = autoContinueCb.checked;
   setMode("focus");
 </script>
 
